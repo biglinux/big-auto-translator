@@ -59,17 +59,9 @@
     # Remove date
     sed -i '/^"POT-Creation-Date:/d;/^"PO-Revision-Date:/d' $DIR/locale/*
 
-    
-    # Install attranslator
-    mkdir -p ${HOME}/.npm-packages
-    npm config set prefix "${HOME}/.npm-packages"
-    NPM_PACKAGES="${HOME}/.npm-packages"
-    export PATH="$PATH:$NPM_PACKAGES/bin"
-    attranslate --version || npm install --location=global attranslate
-
     # Add Subscription-Region support and use brazilsouth
-    if [ "$(grep 'Ocp-Apim-Subscription-Region' $NPM_PACKAGES/lib/node_modules/attranslate/dist/services/azure-translator.js)" = "" ]; then
-        sed -i '/Ocp-Apim-Subscription-Key/a "Ocp-Apim-Subscription-Region": "brazilsouth",' $NPM_PACKAGES/lib/node_modules/attranslate/dist/services/azure-translator.js
+    if [ "$(grep 'Ocp-Apim-Subscription-Region' /usr/local/lib/node_modules/attranslate/dist/services/azure-translator.js)" = "" ]; then
+        sed -i '/Ocp-Apim-Subscription-Key/a "Ocp-Apim-Subscription-Region": "brazilsouth",' /usr/local/lib/node_modules/attranslate/dist/services/azure-translator.js
     fi
 
     # Translate to all $LANGUAGES
