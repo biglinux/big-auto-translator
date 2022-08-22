@@ -57,7 +57,7 @@
     msgen "$DIR/locale/$DIRNAME.pot" > "$DIR/locale/pt-BR.po"
 
     # Remove date
-    sed -i '/^"POT-Creation-Date:/d;/^"PO-Revision-Date:/d' $DIR/locale/*
+    sed -i '/"POT-Creation-Date:/d;/"PO-Revision-Date:/d' $DIR/locale/*
 
     # Add Subscription-Region support and use brazilsouth
     if [ "$(grep 'Ocp-Apim-Subscription-Region' /usr/local/lib/node_modules/attranslate/dist/services/azure-translator.js)" = "" ]; then
