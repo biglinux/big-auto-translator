@@ -2,7 +2,7 @@
 
     DIR="$1"
     DIRNAME="$1"
-    LANGUAGES="en"
+    LANGUAGES="en es"
 
     # Detect if folder use subfolder
     [ -d "$DIR/$DIR" ] && DIR="$DIR/$DIR"
