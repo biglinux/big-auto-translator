@@ -67,7 +67,7 @@
     # Translate to all $LANGUAGES
     for i  in  $LANGUAGES; do    
         # Translate and make .po
-        attranslate --srcFile=$DIR/locale/pt-BR.po --srcLng=pt-BR --srcFormat=po --targetFormat=po --service=azure --serviceConfig=${{ secrets.AZURE_KEY }} --targetFile=$DIR/locale/$i.po --targetLng=$i --overwriteOutdated=true
+        attranslate --srcFile=$DIR/locale/pt-BR.po --srcLng=pt-BR --srcFormat=po --targetFormat=po --service=azure --serviceConfig=$AZURE_KEY --targetFile=$DIR/locale/$i.po --targetLng=$i --overwriteOutdated=true
 
         # Make .mo
         LANGUAGE_UNDERLINE="$(echo $i | sed 's|-|_|g')"
