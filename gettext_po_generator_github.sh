@@ -47,8 +47,8 @@
 
         # Create .pot file
         echo -e "File:\t\t$f"
-
-        /usr/share/doc/python3.10/examples/i18n/pygettext.py -o "$DIR/locale/python.pot" $f
+        sudo pip install python-gettext
+        pygettext3 -o "$DIR/locale/python.pot" $f
         #/usr/lib/python3.10/Tools/i18n/pygettext.py -o "$DIR/locale/python.pot" $f
         msgcat --no-wrap --strict "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/python.pot" > $DIR/locale/$DIRNAME-tmp.pot
         mv -f "$DIR/locale/$DIRNAME-tmp.pot" "$DIR/locale/$DIRNAME.pot"
