@@ -36,6 +36,8 @@
 
 
     # Translate .py files
+    # Install .py dependencies
+    sudo apt install python3.10-examples
     # Search strings to translate
     for f in $(find $DIR -type f);do
 
@@ -46,7 +48,6 @@
         # Create .pot file
         echo -e "File:\t\t$f"
 
-        sudo apt install python3.10-examples
         /usr/share/doc/python3.10/examples/i18n/pygettext.py -o "$DIR/locale/python.pot" $f
         #/usr/lib/python3.10/Tools/i18n/pygettext.py -o "$DIR/locale/python.pot" $f
         msgcat --no-wrap --strict "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/python.pot" > $DIR/locale/$DIRNAME-tmp.pot
