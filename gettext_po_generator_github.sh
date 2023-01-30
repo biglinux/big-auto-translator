@@ -42,7 +42,7 @@
     for f in $(find $DIR -type f);do
 
         # Search python script
-        [ "$(file -b --mime-type $f)" != "text/x-python" ] && continue
+        [ "$(file -b --mime-type $f)" != "text/x-script.python" ] && continue
         [ $(grep 'git' <<< $f) ] && continue
 
         # Create .pot file
