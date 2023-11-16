@@ -35,6 +35,20 @@
     rm $DIR/locale/$DIRNAME-tmp.pot
 
 
+    npm install -g stonejs-tools
+
+    # Search HTML and JS
+    HTML_JS_FILES=$(find $DIR -type f \( -name "*.html" -o -name "*.js" \))
+
+    if [ -n "$HTML_JS_FILES" ]; then
+        stonejs extract $HTML_JS_FILES $DIR/locale/$DIRNAME-htmljs.pot
+
+        # update .po from strings HTML/JS
+        for po_file in $DIR/locale/*.po; do
+            stonejs update $po_file $DIR/locale/$DIRNAME-htmljs.pot
+        done
+    fi
+
     # Translate .py files
     # Install .py dependencies
     sudo pip install python-gettext
@@ -77,5 +91,6 @@
         echo "/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES/$DIRNAME.mo"
     done
 
-
+    # Make json translations
+    stonejs build --format=json $DIR/locale/*.po $DIR/locale
 
