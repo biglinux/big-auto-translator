@@ -41,11 +41,11 @@
     HTML_JS_FILES=$(find $DIR -type f \( -name "*.html" -o -name "*.js" \))
 
     if [ -n "$HTML_JS_FILES" ]; then
-        stonejs extract $HTML_JS_FILES $DIR/locale/$DIRNAME-htmljs.pot
+        stonejs extract $HTML_JS_FILES $DIR/locale/$DIRNAME.pot
 
         # update .po from strings HTML/JS
         for po_file in $DIR/locale/*.po; do
-            stonejs update $po_file $DIR/locale/$DIRNAME-htmljs.pot
+            stonejs update $po_file $DIR/locale/$DIRNAME.pot
         done
     fi
 
