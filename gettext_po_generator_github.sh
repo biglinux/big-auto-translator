@@ -88,7 +88,7 @@
         LANGUAGE_UNDERLINE="$(echo $i | sed 's|-|_|g')"
         mkdir -p $DIR/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES
         # Make json translations
-        stonejs build --format=json "$DIR/locale/$i.po" "$DIR/locale/$i.json"
+        stonejs build --format=json "$DIR/locale/$i.po" "$DIR/locale/"
         cp "$DIR/locale/$i.json" "$DIR/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES/$DIRNAME.json"
         msgfmt "$DIR/locale/$i.po" -o "$DIR/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES/$DIRNAME.mo" || true
         echo "/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES/$DIRNAME.mo"
