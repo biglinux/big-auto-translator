@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Captura a língua original ou define 'pt-BR' como padrão
-OriginalLang=${OriginalLang:-'pt-BR'}
+# Captura a língua original ou define 'en-US' como padrão
+OriginalLang=${OriginalLang:-'en-US'}
 
 DIR="$1"
 DIRNAME="$1"
