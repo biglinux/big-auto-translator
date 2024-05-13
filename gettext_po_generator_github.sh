@@ -88,15 +88,15 @@ msgen "$DIR/locale/$DIRNAME.pot" > "$DIR/locale/$OriginalLang.po"
 # Remove date
 sed -i '/"POT-Creation-Date:/d;/"PO-Revision-Date:/d' $DIR/locale/*
 
-# Add Subscription-Region support and use brazilsouth
-if [ "$(grep 'Ocp-Apim-Subscription-Region' /usr/local/lib/node_modules/attranslate/dist/services/azure-translator.js)" = "" ]; then
-    sudo sed -i '/Ocp-Apim-Subscription-Key/a "Ocp-Apim-Subscription-Region": "brazilsouth",' /usr/local/lib/node_modules/attranslate/dist/services/azure-translator.js
-fi
+# # Add Subscription-Region support and use brazilsouth
+# if [ "$(grep 'Ocp-Apim-Subscription-Region' /usr/local/lib/node_modules/attranslate/dist/services/azure-translator.js)" = "" ]; then
+#     sudo sed -i '/Ocp-Apim-Subscription-Key/a "Ocp-Apim-Subscription-Region": "brazilsouth",' /usr/local/lib/node_modules/attranslate/dist/services/azure-translator.js
+# fi
 
 
-for i in $LANGUAGES; do    
+for i in $LANGUAGES; do
     if [ "$i" != "$OriginalLang" ]; then
-        attranslate --srcFile=$DIR/locale/$OriginalLang.po --srcLng=$OriginalLang --srcFormat=po --targetFormat=po --service=azure --serviceConfig=$AZURE_KEY --targetFile=$DIR/locale/$i.po --targetLng=$i
+        attranslate --srcFile=$DIR/locale/$OriginalLang.po --srcLng=$OriginalLang --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY --targetFile=$DIR/locale/$i.po --targetLng=$i
     fi
 
     # Make .mo
