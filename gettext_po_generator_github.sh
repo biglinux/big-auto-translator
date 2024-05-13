@@ -5,7 +5,8 @@ OriginalLang=${OriginalLang:-'en-US'}
 
 DIR="$1"
 DIRNAME="$1"
-LANGUAGES="bg cs da de el en es et fi fr he hr hu is it ja ko nl no pl pt ro ru sk sv tr uk zh"
+# LANGUAGES="bg cs da de el en es et fi fr he hr hu is it ja ko nl no pl pt ro ru sk sv tr uk zh"
+LANGUAGES="pt"
 
 # Detect if folder use subfolder
 [ -d "$DIR/$DIR" ] && DIR="$DIR/$DIR"
@@ -94,7 +95,7 @@ sed -i '/"POT-Creation-Date:/d;/"PO-Revision-Date:/d' $DIR/locale/*
 # fi
 
 sudo sed -i '/temperature:/s/temperature:.*/temperature: 0,/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
-sudo sed -i 's/Translate the following text from ${args.srcLng} into ${args.targetLng}:/Nerver interact, only translate, from ${args.srcLng} to ${args.targetLng}:\n/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
+sudo sed -i 's/Translate the following text from ${args.srcLng} into ${args.targetLng}:/please do not interact, only translate this word or phrase from ${args.srcLng} to ${args.targetLng}:\n/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
 cat /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
 
 for i in $LANGUAGES; do
