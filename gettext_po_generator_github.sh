@@ -93,7 +93,7 @@ sed -i '/"POT-Creation-Date:/d;/"PO-Revision-Date:/d' $DIR/locale/*
 #     sudo sed -i '/Ocp-Apim-Subscription-Key/a "Ocp-Apim-Subscription-Region": "brazilsouth",' /usr/local/lib/node_modules/attranslate/dist/services/azure-translator.js
 # fi
 
-sudo sed -i '/temperature:/s/temperature:.*/temperature: 0.0,/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
+sudo sed -i '/temperature:/s/temperature:.*/temperature: 0,/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
 cat /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
 
 for i in $LANGUAGES; do
