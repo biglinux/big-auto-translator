@@ -94,7 +94,7 @@ sed -i '/"POT-Creation-Date:/d;/"PO-Revision-Date:/d' $DIR/locale/*
 # fi
 
 sudo sed -i '/temperature:/s/temperature:.*/temperature: 0,/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
-sudo sed -i 's/Translate the following text from ${args.srcLng} into ${args.targetLng}:/Translate from ${args.srcLng} to ${args.targetLng}:\n/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
+sudo sed -i 's/Translate the following text from ${args.srcLng} into ${args.targetLng}:/Nerver interact, only translate, from ${args.srcLng} to ${args.targetLng}:\n/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
 cat /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
 
 for i in $LANGUAGES; do
