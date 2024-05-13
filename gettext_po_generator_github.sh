@@ -44,15 +44,23 @@ npm install -g stonejs-tools
 HTML_JS_FILES=$(find $DIR -type f \( -name "*.html" -o -name "*.js" \))
 
 if [ -n "$HTML_JS_FILES" ]; then
-    stonejs extract $HTML_JS_FILES $DIR/locale/$DIRNAME.pot
+    stonejs extract $HTML_JS_FILES $DIR/locale/$DIRNAME-tmp.pot
 
-#     # update .po from strings HTML/JS
-#     for po_file in $DIR/locale/*.po; do
-#         stonejs update $po_file $DIR/locale/$DIRNAME.pot
-#     done
-    pushd $DIR/locale/
-    stonejs update *.po $DIRNAME.pot
-    popd
+    # Method 1
+    #     # update .po from strings HTML/JS
+    #     for po_file in $DIR/locale/*.po; do
+    #         stonejs update $po_file $DIR/locale/$DIRNAME.pot
+    #     done
+
+    # Method 2
+    #    pushd $DIR/locale/
+    #    stonejs update *.po $DIRNAME.pot
+    #    popd
+
+    # Method 3 Fix pot file
+    xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
+    rm $DIR/locale/$DIRNAME-tmp.pot
+
 fi
 
 # Translate .py files
