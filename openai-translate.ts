@@ -17,7 +17,7 @@ async function translateSingleString(str, args) {
   const messages = generateMessages(str, args);
   try {
     const completion = await openai.createChatCompletion({
-      model: "gpt-4-turbo",
+      model: "gpt-4o",
       messages: messages,
       temperature: 0.2,
       max_tokens: 2048,
