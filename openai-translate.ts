@@ -22,7 +22,7 @@ async function translateSingleString(str, args) {
    */
   try {
     const completion = await openai.createCompletion({
-      model: "gpt-3.5-turbo-instruct",
+      model: "gpt-4o",
       prompt,
       temperature: 0.2,
       max_tokens: 2048,
@@ -33,15 +33,13 @@ async function translateSingleString(str, args) {
     }
     return text;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  }
-  catch (e) {
+  } catch (e) {
     if (typeof e.message === "string") {
       (0, util_1.logFatal)("OpenAI: " +
-      e.message +
-      ", Status text: " +
-      JSON.stringify((_a = e === null || e === void 0 ? void 0 : e.response) === null || _a === void 0 ? void 0 : _a.statusText));
-    }
-    else {
+        e.message +
+        ", Status text: " +
+        JSON.stringify((_a = e === null || e === void 0 ? void 0 : e.response) === null || _a === void 0 ? void 0 : _a.statusText));
+    } else {
       throw e;
     }
   }
@@ -49,7 +47,7 @@ async function translateSingleString(str, args) {
 function generatePrompt(str, args) {
   const capitalizedText = str[0].toUpperCase() + str.slice(1).toLowerCase();
   return (`Translate the following text from ${args.srcLng} into ${args.targetLng}: ` +
-  capitalizedText);
+    capitalizedText);
 }
 async function translateBatch(batch, args) {
   console.log("Translate a batch of " + batch.length + " strings with OpenAI...");
