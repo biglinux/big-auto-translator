@@ -124,7 +124,7 @@ for i in $LANGUAGES; do
     msgfmt "$DIR/locale/$i.po" -o "$DIR/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES/$DIRNAME.mo" || true
     echo "/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES/$DIRNAME.mo"
 
-    sleep 2
+#     sleep 2
 done
 
 
