@@ -19,7 +19,7 @@ async function translateSingleString(str, args) {
     const completion = await openai.createChatCompletion({
       model: "gpt-4o",
       messages: messages,
-      temperature: 0,
+      temperature: 0.1,
       max_tokens: 2048,
     });
     const text = completion.data.choices[0].message.content;
@@ -39,10 +39,10 @@ async function translateSingleString(str, args) {
   }
 }
 function generateMessages(str, args) {
-  const capitalizedText = str[0].toUpperCase() + str.slice(1).toLowerCase();
+  const capitalizedText = str;
   const systemMessage = {
     role: "system",
-    content: `I created a software and need the translation of the strings, tells me the translation from language ${args.srcLng} to ${args.targetLng}, the string: `
+    content: `My software need translate strings from ${args.srcLng} to ${args.targetLng}. Even if it is just one word or letter. in a way that is correct for a software interface, using the correct terms in the target language. all you do is translate, if you don't find something to translate, don't respond:`
   };
   const userMessage = {
     role: "user",
