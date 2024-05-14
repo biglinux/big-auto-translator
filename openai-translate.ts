@@ -19,7 +19,7 @@ async function translateSingleString(str, args) {
     const completion = await openai.createChatCompletion({
       model: "gpt-4o",
       messages: messages,
-      temperature: 0.2,
+      temperature: 0,
       max_tokens: 2048,
     });
     const text = completion.data.choices[0].message.content;
@@ -42,7 +42,7 @@ function generateMessages(str, args) {
   const capitalizedText = str[0].toUpperCase() + str.slice(1).toLowerCase();
   const systemMessage = {
     role: "system",
-    content: `You are a translation assistant. Translate the following text from ${args.srcLng} to ${args.targetLng}.`
+    content: `Translate the following text from ${args.srcLng} to ${args.targetLng}`
   };
   const userMessage = {
     role: "user",
