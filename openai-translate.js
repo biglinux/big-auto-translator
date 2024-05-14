@@ -42,8 +42,8 @@ function generateMessages(str, args) {
   const capitalizedText = str;
   const systemMessage = {
     role: "system",
-    content: `My software need translate strings from ${args.srcLng} to ${args.targetLng}. Even if it is just one word or letter. in a way that is correct for a software interface, using the correct terms for computer software in the target language. all you do is translate, if you don't find something to translate, don't respond:`
-  };
+    content: `only translate my software string from ${args.srcLng} to ${args.targetLng}. don't chat or explain. Using the correct terms for computer software in the target language, only show target language never repeat string. if you don't find something to translate, don't respond, string:`
+  };  
   const userMessage = {
     role: "user",
     content: capitalizedText
