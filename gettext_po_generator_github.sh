@@ -116,7 +116,7 @@ for i in $LANGUAGES; do
     # Make json translations
     if [[ -e "$DIR/locale/$i.po" ]]; then
         stonejs build --format=json --merge "$DIR/locale/$i.po" "$DIR/locale/$i.json"
-        sed -i "s|^{\"C\"|{\"$DIR\"|g" "$DIR/locale/$i.json"
+        sed -i "s|^{\"$i\"|{\"$DIR\"|g;s|^{\"C\"|^{\"$i\"|g" "$DIR/locale/$i.json"
     else
         rm -f "$DIR/locale/$i.json"
     fi
