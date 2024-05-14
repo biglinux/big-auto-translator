@@ -32,8 +32,8 @@ async function translateSingleString(
    */
   try {
     const completion = await openai.createCompletion({
-      model: "gpt-3.5-turbo-instruct",
-      prompt,
+      model: "gpt-3.5-turbo-0125",
+      messages: [{role: "user", content: prompt}],
       temperature: 0.2,
       max_tokens: 2048,
     });
