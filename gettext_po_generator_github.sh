@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Captura a língua original ou define 'en-US' como padrão
-OriginalLang=${OriginalLang:-'en-US'}
+OriginalLang=${OriginalLang:-'en'}
 
 DIR="$1"
 DIRNAME="$1"
-LANGUAGES="bg cs da de el en es et fi fr he hr hu is it ja ko nl no pl pt ro ru sk sv tr uk zh"
-# LANGUAGES="pt"
+# LANGUAGES="bg cs da de el en es et fi fr he hr hu is it ja ko nl no pl pt ro ru sk sv tr uk zh"
+LANGUAGES="pt de es fr"
 
 # Detect if folder use subfolder
 [ -d "$DIR/$DIR" ] && DIR="$DIR/$DIR"
