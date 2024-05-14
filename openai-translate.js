@@ -42,7 +42,7 @@ function generateMessages(str, args) {
   const capitalizedText = str[0].toUpperCase() + str.slice(1).toLowerCase();
   const systemMessage = {
     role: "system",
-    content: `please dont interact, just translate this word or phrase, if you only have one word, just answer me the translation of that word, dont write the original word, the text is from a software interface, translate it technically and accurately from ${args.srcLng} to ${args.targetLng}:`
+    content: `Translate the following text in a technical way, be direct and only respond to the translation that will be applied in the translation of software, from ${args.srcLng} to ${args.targetLng} `
   };
   const userMessage = {
     role: "user",
