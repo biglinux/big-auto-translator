@@ -97,8 +97,8 @@ sed -i '/"POT-Creation-Date:/d;/"PO-Revision-Date:/d' $DIR/locale/*
 # sudo sed -i '/temperature:/s/temperature:.*/temperature: 0,/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
 # sudo sed -i 's/Translate the following text from ${args.srcLng} into ${args.targetLng}:/please don't interact, just translate this word or phrase, if you only have one word, just tell me the translation of that word from ${args.srcLng} to ${args.targetLng}:/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
 sudo sed -i 's/gpt-3.5-turbo-instruct/gpt-3.5-turbo-0125/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
-sudo sed -i 's/openai.createCompletion/openai.completions.create/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
-sudo sed -i 's/completion.data.choices[0].text/completion.choices[0].text/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
+sudo sed -i 's/openai.createCompletion/openai.createChatCompletion/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
+sudo sed -i 's/completion.data.choices[0].text/chatCompletion.data.choices[0].message/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
 
 cat /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
 
