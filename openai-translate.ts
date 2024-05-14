@@ -21,13 +21,13 @@ async function translateSingleString(str, args) {
    * We generally recommend altering this or top_p but not both.
    */
   try {
-    const chatCompletion = await openai.createChatCompletion({
+    const completion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo-0125",
       messages: [{role: "user", content: prompt}],
       temperature: 0.2,
       max_tokens: 2048,
     });
-    const text = chatCompletion.data.choices[0].message;
+    const text = completion.data.choices[0].message;
     if (text == undefined) {
       (0, util_1.logFatal)("OpenAI returned undefined for prompt " + prompt);
     }
