@@ -110,6 +110,8 @@ for i in $LANGUAGES; do
         attranslate --srcFile=$DIR/locale/$OriginalLang.po --srcLng=$OriginalLang --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY --targetFile=$DIR/locale/$i.po --targetLng=$i
     fi
 
+    sed -i '/Content-Type: text\/plain;/s/charset=.*\\/charset=utf-8\\/' $DIR/locale/$i.po
+
     # Make .mo
     LANGUAGE_UNDERLINE="$(echo $i | sed 's|-|_|g')"
     mkdir -p $DIR/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES
