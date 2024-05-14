@@ -31,7 +31,7 @@ async function translateSingleString(
    * We generally recommend altering this or top_p but not both.
    */
   try {
-    const completion = await openai.createCompletion({
+    const completion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo-0125",
       messages: [{role: "user", content: prompt}],
       temperature: 0.2,
