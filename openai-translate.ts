@@ -14,25 +14,19 @@ async function translateSingleString(str, args) {
     apiKey: OPENAI_API_KEY,
   });
   const openai = new openai_1.OpenAIApi(configuration);
-  const prompt = generatePrompt(str, args);
-  /**
-   * https://platform.openai.com/docs/api-reference/completions/create
-   * What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.
-   * We generally recommend altering this or top_p but not both.
-   */
+  const messages = generateMessages(str, args);
   try {
-    const completion = await openai.createCompletion({
-      model: "gpt-4o",
-      prompt,
+    const completion = await openai.createChatCompletion({
+      model: "gpt-4-turbo",
+      messages: messages,
       temperature: 0.2,
       max_tokens: 2048,
     });
-    const text = completion.data.choices[0].text;
+    const text = completion.data.choices[0].message.content;
     if (text == undefined) {
-      (0, util_1.logFatal)("OpenAI returned undefined for prompt " + prompt);
+      (0, util_1.logFatal)("OpenAI returned undefined for messages " + JSON.stringify(messages));
     }
     return text;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e) {
     if (typeof e.message === "string") {
       (0, util_1.logFatal)("OpenAI: " +
@@ -44,10 +38,17 @@ async function translateSingleString(str, args) {
     }
   }
 }
-function generatePrompt(str, args) {
+function generateMessages(str, args) {
   const capitalizedText = str[0].toUpperCase() + str.slice(1).toLowerCase();
-  return (`Translate the following text from ${args.srcLng} into ${args.targetLng}: ` +
-    capitalizedText);
+  const systemMessage = {
+    role: "system",
+    content: `You are a translation assistant. Translate the following text from ${args.srcLng} to ${args.targetLng}.`
+  };
+  const userMessage = {
+    role: "user",
+    content: capitalizedText
+  };
+  return [systemMessage, userMessage];
 }
 async function translateBatch(batch, args) {
   console.log("Translate a batch of " + batch.length + " strings with OpenAI...");
