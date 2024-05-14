@@ -22,7 +22,7 @@ async function translateSingleString(str, args) {
    */
   try {
     const completion = await openai.createCompletion({
-      model: "gpt-4o",
+      model: "gpt-3.5-turbo-instruct",
       prompt,
       temperature: 0.2,
       max_tokens: 2048,
