@@ -40,6 +40,7 @@ rm $DIR/locale/$DIRNAME-tmp.pot
 
 
 npm install -g stonejs-tools
+wget https://raw.githubusercontent.com/biglinux/stonejs-tools/master/src/extract.js -O /usr/local/lib/node_modules/stonejs-tools/src/extract.js
 
 # Search HTML and JS
 HTML_JS_FILES=$(find $DIR -type f \( -name "*.html" -o -name "*.js" \))
