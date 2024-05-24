@@ -26,7 +26,6 @@ for f in $(find $DIR \( -path "*/.git" -o -path "*/.github" \) -prune -o -type f
 
     # Search shell script
     [ "$(file -b --mime-type $f)" != "text/x-shellscript" ] && continue
-    [ $(grep 'git' <<< $f) ] && continue
 
     # Create .pot file
     echo -e "File:\t\t$f"
