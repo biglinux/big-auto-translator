@@ -26,6 +26,7 @@ for f in $(find $DIR \( -path "*/.git" -o -path "*/.github" \) -prune -o -type f
 
     # Search shell script
     [ "$(file -b --mime-type $f)" != "text/x-shellscript" ] && continue
+    [ $(grep 'git' <<< $f) ] && continue
 
     # Create .pot file
     echo -e "File:\t\t$f"
@@ -64,7 +65,8 @@ if [ -n "$HTML_JS_FILES" ]; then
     # Combine files from bash and js/html
     if [[ -e "$DIR/locale/$DIRNAME.pot" ]]; then
         mv "$DIR/locale/$DIRNAME.pot" "$DIR/locale/$DIRNAME-bash.pot"
-        cat "$DIR/locale/$DIRNAME-bash.pot" "$DIR/locale/$DIRNAME-js.pot" | msguniq > "$DIR/locale/$DIRNAME.pot"
+        msgcat --no-wrap --strict "$DIR/locale/$DIRNAME-bash.pot" -i "$DIR/locale/$DIRNAME-js.pot" > $DIR/locale/$DIRNAME-tmp.pot
+        xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
         rm "$DIR/locale/$DIRNAME-bash.pot"
         rm "$DIR/locale/$DIRNAME-js.pot"
     else
@@ -77,7 +79,7 @@ fi
 # Install .py dependencies
 sudo pip install python-gettext
 # Search strings to translate
-for f in $(find $DIR -type f);do
+for f in $(find $DIR \( -path "*/.git" -o -path "*/.github" \) -prune -o -type f);do
 
     # Search python script
     [ "$(file -b --mime-type $f)" != "text/x-script.python" ] && continue
