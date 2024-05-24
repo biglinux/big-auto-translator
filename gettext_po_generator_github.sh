@@ -59,8 +59,18 @@ if [ -n "$HTML_JS_FILES" ]; then
     #    popd
 
     # Method 3 Fix pot file
-    xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
+    xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME-js.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
     rm $DIR/locale/$DIRNAME-tmp.pot
+
+    # Combine files from bash and js/html
+    if [[ -e "$DIR/locale/$DIRNAME.pot" ]]; then
+        mv "$DIR/locale/$DIRNAME.pot" "$DIR/locale/$DIRNAME-bash.pot"
+        cat "$DIR/locale/$DIRNAME-bash.pot" "$DIR/locale/$DIRNAME-js.pot" | msguniq > "$DIR/locale/$DIRNAME.pot"
+        rm "$DIR/locale/$DIRNAME-bash.pot"
+        rm "$DIR/locale/$DIRNAME-js.pot"
+    else
+        mv "$DIR/locale/$DIRNAME-js.pot" "$DIR/locale/$DIRNAME.pot"
+    fi
 
 fi
 
