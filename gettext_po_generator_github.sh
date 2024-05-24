@@ -21,8 +21,12 @@ LANGUAGES="bg cs da de el en es et fi fr he hr hu is it ja ko nl no pl pt ro ru 
 [ -e $DIR/locale/$DIRNAME.pot ] && rm $DIR/locale/$DIRNAME.pot
 echo -e "Directory:\t$DIR"
 
+
+find . \( -path "*/.git" -o -path "*/.github" \) -prune -o -type f -name "*.sh" -print
+
+
 # Search strings to translate
-for f in $(find $DIR -type f);do
+for f in $(find $DIR \( -path "*/.git" -o -path "*/.github" \) -prune -o -type f);do
 
     # Search shell script
     [ "$(file -b --mime-type $f)" != "text/x-shellscript" ] && continue
