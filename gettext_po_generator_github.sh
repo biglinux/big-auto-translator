@@ -21,10 +21,6 @@ LANGUAGES="bg cs da de el en es et fi fr he hr hu is it ja ko nl no pl pt ro ru 
 [ -e $DIR/locale/$DIRNAME.pot ] && rm $DIR/locale/$DIRNAME.pot
 echo -e "Directory:\t$DIR"
 
-
-find . \( -path "*/.git" -o -path "*/.github" \) -prune -o -type f -name "*.sh" -print
-
-
 # Search strings to translate
 for f in $(find $DIR \( -path "*/.git" -o -path "*/.github" \) -prune -o -type f);do
 
@@ -35,7 +31,6 @@ for f in $(find $DIR \( -path "*/.git" -o -path "*/.github" \) -prune -o -type f
     # Create .pot file
     echo -e "File:\t\t$f"
     bash --dump-po-strings $f >> $DIR/locale/$DIRNAME-tmp.pot
-
 done
 
 # Fix pot file
