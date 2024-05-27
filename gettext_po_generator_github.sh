@@ -115,7 +115,7 @@ sed -i '/"POT-Creation-Date:/d;/"PO-Revision-Date:/d' $DIR/locale/*
 # sudo sed -i 's/Translate the following text from ${args.srcLng} into ${args.targetLng}:/only translate my software string from ${args.srcLng} to ${args.targetLng}. dont chat or explain. Using the correct terms for computer software in the target language, only show target language never repeat string. if you dont find something to translate, dont respond, string:/' /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
 
 
-cat /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
+# cat /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
 
 for i in $LANGUAGES; do
     if [ "$i" != "$OriginalLang" ]; then
