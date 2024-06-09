@@ -8,6 +8,21 @@ DIRNAME="$1"
 LANGUAGES="bg cs da de el en es et fi fr he hr hu is it ja ko nl no pl pt ro ru sk sv tr uk zh"
 # LANGUAGES="pt de es fr"
 
+if [ -z "$OPENAI_KEY" ];then
+    red='\e[31;1m'
+    neg='\e[37;1m'
+    std='\e[m'
+    echo -e "${red}Atualize o workflow de tradução.\nO exemplo se encontra em \"https://github.com/biglinux/biglinux-package-with-translate/blob/main/.github/workflows/translate-and-build-package.yml\" ${std}"
+    echo
+    echo -e "${red}Atualize o workflow de tradução.\nO exemplo se encontra em \"https://github.com/biglinux/biglinux-package-with-translate/blob/main/.github/workflows/translate-and-build-package.yml\" ${std}"
+    curl -s -H "Authorization: token ${{ github.token }}" \
+    -X POST "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/cancel"
+    echo -e "${red}Atualize o workflow de tradução.\nO exemplo se encontra em \"https://github.com/biglinux/biglinux-package-with-translate/blob/main/.github/workflows/translate-and-build-package.yml\" ${std}"
+    echo
+    echo -e "${red}Atualize o workflow de tradução.\nO exemplo se encontra em \"https://github.com/biglinux/biglinux-package-with-translate/blob/main/.github/workflows/translate-and-build-package.yml\" ${std}"
+    sleep infinity
+fi
+
 # Detect if folder use subfolder
 [ -d "$DIR/$DIR" ] && DIR="$DIR/$DIR"
 
