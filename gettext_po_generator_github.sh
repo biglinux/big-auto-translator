@@ -44,6 +44,7 @@ for f in $(find $DIR \( -path "*/.git" -o -path "*/.github" \) -prune -o -type f
     # Create .pot file
     echo -e "File:\t\t$f"
     bash --dump-po-strings $f >> $DIR/locale/$DIRNAME-tmp.pot
+    [ "$?" != "0" ] && exit 1
 done
 
 # Fix pot file
@@ -105,6 +106,7 @@ for f in $(find $DIR \( -path "*/.git" -o -path "*/.github" \) -prune -o -type f
     #/usr/lib/python3.10/Tools/i18n/pygettext.py -o "$DIR/locale/python.pot" $f
     msgcat --no-wrap --strict "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/python.pot" > $DIR/locale/$DIRNAME-tmp.pot
     xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
+#     [ "$?" != "0" ] && exit 1
     rm -f "$DIR/locale/python.pot"
 done
 
@@ -149,6 +151,7 @@ for i in $LANGUAGES; do
     fi
     cp "$DIR/locale/$i.json" "$DIR/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES/$DIRNAME.json"
     msgfmt "$DIR/locale/$i.po" -o "$DIR/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES/$DIRNAME.mo" || true
+#     [ "$?" != "0" ] && exit 1
     echo "/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES/$DIRNAME.mo"
 
 #     sleep 2
