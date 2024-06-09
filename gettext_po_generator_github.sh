@@ -15,8 +15,6 @@ if [ -z "$OPENAI_KEY" ];then
     echo -e "${red}Atualize o workflow de tradução.\nO exemplo se encontra em \"https://github.com/biglinux/biglinux-package-with-translate/blob/main/.github/workflows/translate-and-build-package.yml\" ${std}"
     echo
     echo -e "${red}Atualize o workflow de tradução.\nO exemplo se encontra em \"https://github.com/biglinux/biglinux-package-with-translate/blob/main/.github/workflows/translate-and-build-package.yml\" ${std}"
-    curl -s -H "Authorization: token ${{ github.token }}" \
-    -X POST "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/cancel"
     echo -e "${red}Atualize o workflow de tradução.\nO exemplo se encontra em \"https://github.com/biglinux/biglinux-package-with-translate/blob/main/.github/workflows/translate-and-build-package.yml\" ${std}"
     echo
     echo -e "${red}Atualize o workflow de tradução.\nO exemplo se encontra em \"https://github.com/biglinux/biglinux-package-with-translate/blob/main/.github/workflows/translate-and-build-package.yml\" ${std}"
