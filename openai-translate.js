@@ -42,7 +42,7 @@ function generateMessages(str, args) {
   const capitalizedText = str;
   const systemMessage = {
     role: "system",
-    content: `only translate my software string from ${args.srcLng} to ${args.targetLng}. don't chat or explain. Using the correct terms for computer software in the target language, only show target language never repeat string. if you don't find something to translate, don't respond, string:`
+    content: `work as a text translator, only translate my software string from ${args.srcLng} to ${args.targetLng}. don't chat or explain. Using the correct terms for computer software in the target language, only show target language never repeat string. if you don't find something to translate, don't respond, string:`
   };  
   const userMessage = {
     role: "user",
