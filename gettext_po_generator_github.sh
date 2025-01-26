@@ -34,7 +34,9 @@ fi
 [ -e $DIR/locale/$DIRNAME.pot ] && rm $DIR/locale/$DIRNAME.pot
 echo -e "Directory:\t$DIR"
 
-# Search strings to translate
+#######################
+# Translate shellscript
+#######################
 for f in $(find $DIR \( -path "*/.git" -o -path "*/.github" \) -prune -o -type f);do
 
     # Search shell script
@@ -90,7 +92,110 @@ if [ -n "$HTML_JS_FILES" ]; then
     fi
 fi
 
-# Translate .py files
+
+###############
+# Translate QML
+###############
+QML_FILES=$(find $DIR -type f \( -name "*.qml" \))
+
+if [ -n "$QML_FILES" ]; then
+
+    echo $QML_FILES | while read -r file; do
+        # Get relative path
+        rel_path=$(realpath --relative-to="$DIR" "$file")
+        echo "Processing: $rel_path"
+
+        # Extract strings from i18n, i18nc, and qsTr
+        awk -v file="$rel_path" '
+        BEGIN {
+            in_string = 0
+            multiline_string = ""
+            start_line = 0
+        }
+        
+        function process_string(str, line_no) {
+            gsub(/^["'\''"]|["'\''"]$/, "", str)  # Remove outer quotes
+            gsub(/\\["'\'']/, "\"", str)          # Escape quotes for PO file
+            
+            if (str != "") {
+                print "#: " file ":" line_no
+                
+                # Split into lines and format each line
+                n = split(str, lines, /\n/)
+                if (n == 1) {
+                    print "msgid \"" str "\""
+                } else {
+                    print "msgid \"" lines[1] "\\n\""
+                    for (i = 2; i <= n; i++) {
+                        if (i == n) {
+                            print "\"" lines[i] "\""
+                        } else {
+                            print "\"" lines[i] "\\n\""
+                        }
+                    }
+                }
+                print "msgstr \"\"\n"
+            }
+        }
+        
+        {
+            line = $0
+            line_number = NR
+            
+            if (!in_string) {
+                # Procura por início de i18nc
+                if (match(line, /i18nc[ ]*\([^,]*,[ ]*["'\'']/, arr)) {
+                    in_string = 1
+                    start_line = NR
+                    start_pos = RSTART + RLENGTH - 1
+                    multiline_string = substr(line, start_pos + 1)
+                }
+                # Procura por início de i18n/qsTr
+                else if (match(line, /(i18n|qsTr)[ ]*\(["'\'']/, arr)) {
+                    in_string = 1
+                    start_line = NR
+                    start_pos = RSTART + RLENGTH - 1
+                    multiline_string = substr(line, start_pos + 1)
+                }
+            } else {
+                multiline_string = multiline_string "\n" line
+            }
+            
+            if (in_string) {
+                # Procura pelo fechamento da string
+                if (match(multiline_string, /([^\\]|^)["'\'']/, arr)) {
+                    in_string = 0
+                    end_pos = RSTART + RLENGTH - 1
+                    complete_string = substr(multiline_string, 1, end_pos - 1)
+                    process_string(complete_string, start_line)
+                    multiline_string = ""
+                }
+            }
+        }' "$file" >> $DIR/locale/$DIRNAME-tmp.pot
+    done
+
+    # Method 3 Fix pot file
+    xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME-qml.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
+    rm $DIR/locale/$DIRNAME-tmp.pot
+
+    # Combine files from bash and js/html
+    if [[ -e "$DIR/locale/$DIRNAME-qml.pot" ]]; then
+        if [[ -e "$DIR/locale/$DIRNAME.pot" ]]; then
+            mv "$DIR/locale/$DIRNAME.pot" "$DIR/locale/$DIRNAME-bash.pot"
+            msgcat --no-wrap --strict "$DIR/locale/$DIRNAME-bash.pot" -i "$DIR/locale/$DIRNAME-qml.pot" > $DIR/locale/$DIRNAME-tmp.pot
+            xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
+            rm "$DIR/locale/$DIRNAME-bash.pot"
+            rm "$DIR/locale/$DIRNAME-qml.pot"
+        else
+            mv "$DIR/locale/$DIRNAME-qml.pot" "$DIR/locale/$DIRNAME.pot"
+        fi
+    fi
+
+fi
+
+###############
+# Translate .py
+###############
 # Install .py dependencies
 sudo pip install python-gettext
 # Search strings to translate
