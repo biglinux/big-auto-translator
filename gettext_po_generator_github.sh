@@ -100,7 +100,7 @@ QML_FILES=$(find $DIR -type f \( -name "*.qml" \))
 
 if [ -n "$QML_FILES" ]; then
 
-    echo $QML_FILES | while read -r file; do
+    echo "$QML_FILES" | while read -r file; do
         # Get relative path
         rel_path=$(realpath --relative-to="$DIR" "$file")
         echo "Processing: $rel_path"
