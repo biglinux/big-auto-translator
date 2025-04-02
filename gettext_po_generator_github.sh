@@ -202,6 +202,7 @@ for f in $(find $DIR -type f \( -iname "*.py" \));do
     #/usr/lib/python3.10/Tools/i18n/pygettext.py -o "$DIR/locale/python.pot" $f
     msgcat --no-wrap --strict "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/python.pot" > $DIR/locale/$DIRNAME-tmp.pot
     xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
+    rm $DIR/locale/$DIRNAME-tmp.pot
 #     [ "$?" != "0" ] && exit 1
     rm -f "$DIR/locale/python.pot"
 done
