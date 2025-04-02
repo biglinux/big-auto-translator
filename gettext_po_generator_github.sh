@@ -5,7 +5,6 @@ OriginalLang=${OriginalLang:-'en'}
 
 DIR="$1"
 DIRNAME="$1"
-ADD_JSON="$2" # if $2 = "json" add json translation,only needed for js on bigbashview
 LANGUAGES="bg cs da de el en es et fi fr he hr hu is it ja ko nl no pl pt ro ru sk sv tr uk zh"
 # LANGUAGES="pt de es fr"
 
@@ -62,6 +61,7 @@ wget https://raw.githubusercontent.com/biglinux/stonejs-tools/master/src/extract
 HTML_JS_FILES=$(find $DIR -type f \( -iname "*.html" -o -iname "*.js" \))
 
 if [ -n "$HTML_JS_FILES" ]; then
+    ADD_JSON="json" # Enable to create .json translations for use on html/js
     stonejs extract $HTML_JS_FILES $DIR/locale/$DIRNAME-tmp.pot
 
     xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME-js.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
