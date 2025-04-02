@@ -58,23 +58,11 @@ npm install -g stonejs-tools
 wget https://raw.githubusercontent.com/biglinux/stonejs-tools/master/src/extract.js -O /usr/local/lib/node_modules/stonejs-tools/src/extract.js
 
 # Search HTML and JS
-HTML_JS_FILES=$(find $DIR -type f \( -name "*.html" -o -name "*.js" \))
+HTML_JS_FILES=$(find $DIR -type f \( -iname "*.html" -o -iname "*.js" \))
 
 if [ -n "$HTML_JS_FILES" ]; then
     stonejs extract $HTML_JS_FILES $DIR/locale/$DIRNAME-tmp.pot
 
-    # Method 1
-    #     # update .po from strings HTML/JS
-    #     for po_file in $DIR/locale/*.po; do
-    #         stonejs update $po_file $DIR/locale/$DIRNAME.pot
-    #     done
-
-    # Method 2
-    #    pushd $DIR/locale/
-    #    stonejs update *.po $DIRNAME.pot
-    #    popd
-
-    # Method 3 Fix pot file
     xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME-js.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
     rm $DIR/locale/$DIRNAME-tmp.pot
 
@@ -96,7 +84,7 @@ fi
 ###############
 # Translate QML
 ###############
-QML_FILES=$(find $DIR -type f \( -name "*.qml" \))
+QML_FILES=$(find $DIR -type f \( -iname "*.qml" \))
 
 if [ -n "$QML_FILES" ]; then
 
@@ -197,13 +185,13 @@ fi
 # Translate .py
 ###############
 # Install .py dependencies
-sudo pip install python-gettext
+# sudo pip install python-gettext
 # Search strings to translate
-for f in $(find $DIR \( -path "*/.git" -o -path "*/.github" \) -prune -o -type f);do
+for f in $(find $DIR -type f \( -iname "*.py" \));do
 
     # Search python script
-    [ "$(file -b --mime-type $f)" != "text/x-script.python" ] && continue
-    [ $(grep 'git' <<< $f) ] && continue
+    # [ "$(file -b --mime-type $f)" != "text/x-script.python" ] && continue
+    # [ $(grep 'git' <<< $f) ] && continue
 
     [ ! -e "$DIR/locale/$DIRNAME.pot" ] && >"$DIR/locale/$DIRNAME.pot"
     # Create .pot file
