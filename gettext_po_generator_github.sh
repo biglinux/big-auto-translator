@@ -208,8 +208,8 @@ for f in $(find $DIR \( -path "*/.git" -o -path "*/.github" \) -prune -o -type f
     [ ! -e "$DIR/locale/$DIRNAME.pot" ] && >"$DIR/locale/$DIRNAME.pot"
     # Create .pot file
     echo -e "File:\t\t$f"
-    #xgettext -L Python $f -o "$DIR/locale/python.pot"
-    pygettext3 -o "$DIR/locale/python.pot" $f
+    xgettext -o "$DIR/locale/python.pot" $f
+    #pygettext3 -o "$DIR/locale/python.pot" $f
     #/usr/lib/python3.10/Tools/i18n/pygettext.py -o "$DIR/locale/python.pot" $f
     msgcat --no-wrap --strict "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/python.pot" > $DIR/locale/$DIRNAME-tmp.pot
     xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
