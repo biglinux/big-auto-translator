@@ -5,6 +5,7 @@ OriginalLang=${OriginalLang:-'en'}
 
 DIR="$1"
 DIRNAME="$1"
+ADD_JSON="$2" # if $2 = "json" add json translation,only needed for js on bigbashview
 LANGUAGES="bg cs da de el en es et fi fr he hr hu is it ja ko nl no pl pt ro ru sk sv tr uk zh"
 # LANGUAGES="pt de es fr"
 
@@ -237,13 +238,16 @@ for i in $LANGUAGES; do
     # Make .mo
     LANGUAGE_UNDERLINE="$(echo $i | sed 's|-|_|g')"
     mkdir -p $DIR/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES
-    # Make json translations
-    if [[ -e "$DIR/locale/$i.po" ]]; then
-        stonejs build --format=json --merge "$DIR/locale/$i.po" "$DIR/locale/$i.json"
-        sed -i "s|^{\"$i\"|{\"$DIR\"|g;s|^{\"C\"|{\"$i\"|g" "$DIR/locale/$i.json"
-    else
-        rm -f "$DIR/locale/$i.json"
+    # Make json translations ( Only if $2 is json word )
+    if [[ "$ADD_JSON" == "json" ]]; then
+        if [[ -e "$DIR/locale/$i.po" ]]; then
+            stonejs build --format=json --merge "$DIR/locale/$i.po" "$DIR/locale/$i.json"
+            sed -i "s|^{\"$i\"|{\"$DIR\"|g;s|^{\"C\"|{\"$i\"|g" "$DIR/locale/$i.json"
+        else
+            rm -f "$DIR/locale/$i.json"
+        fi
     fi
+
     cp "$DIR/locale/$i.json" "$DIR/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES/$DIRNAME.json"
     msgfmt "$DIR/locale/$i.po" -o "$DIR/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES/$DIRNAME.mo" || true
 #     [ "$?" != "0" ] && exit 1
