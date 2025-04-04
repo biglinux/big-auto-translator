@@ -231,8 +231,52 @@ sed -i '/"POT-Creation-Date:/d;/"PO-Revision-Date:/d' $DIR/locale/*
 
 for i in $LANGUAGES; do
     if [ "$i" != "$OriginalLang" ]; then
-        attranslate --srcFile=$DIR/locale/$OriginalLang.po --srcLng=$OriginalLang --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY --targetFile=$DIR/locale/$i.po --targetLng=$i
+        attranslate --srcFile=$DIR/locale/$OriginalLang.po --srcLng=$OriginalLang --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY  --targetLng=$i
+
+        # Remove line translated with add any year from 2020 and 2029 common error on chatgpt
+        awk 'BEGIN {buf=""}
+        {
+        if(buf ~ /^msgid/ && buf !~ /202./ && $0 ~ /^msgstr/ && $0 ~ /202./) {
+            buf="";
+        } else if(buf) {
+            print buf;
+            buf=$0;
+        } else {
+            buf=$0;
+        }
+        }
+        END {if(buf) print buf}' "$OriginalLang.po" > "$OriginalLang"
+
+        file1_md5=$(md5sum "$OriginalLang.po" | awk '{ print $1 }')
+        file2_md5=$(md5sum "$OriginalLang" | awk '{ print $1 }')
+
+        mv -f "$OriginalLang" "$OriginalLang.po"
+
+        # Verify if remove date error from chatgpt and try again
+        if [ "$file1_md5" != "$file2_md5" ]; then
+            attranslate --srcFile=$DIR/locale/$OriginalLang.po --srcLng=$OriginalLang --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY  --targetLng=$i
+
+            # Remove line translated with add any year from 2020 and 2029 common error on chatgpt
+            awk 'BEGIN {buf=""}
+            {
+            if(buf ~ /^msgid/ && buf !~ /202./ && $0 ~ /^msgstr/ && $0 ~ /202./) {
+                buf="";
+            } else if(buf) {
+                print buf;
+                buf=$0;
+            } else {
+                buf=$0;
+            }
+            }
+            END {if(buf) print buf}' "$OriginalLang.po" > "$OriginalLang"
+
+            file1_md5=$(md5sum "$OriginalLang.po" | awk '{ print $1 }')
+            file2_md5=$(md5sum "$OriginalLang" | awk '{ print $1 }')
+
+            mv -f "$OriginalLang" "$OriginalLang.po"
+        fi
     fi
+
 
     sed -i '/Content-Type: text\/plain;/s/charset=.*\\/charset=utf-8\\/' $DIR/locale/$i.po
 
