@@ -245,12 +245,12 @@ for i in $LANGUAGES; do
             buf=$0;
         }
         }
-        END {if(buf) print buf}' "$OriginalLang.po" > "$OriginalLang"
+        END {if(buf) print buf}' "$OriginalLang.po" > "$OriginalLang.tmp"
 
         file1_md5=$(md5sum "$OriginalLang.po" | awk '{ print $1 }')
-        file2_md5=$(md5sum "$OriginalLang" | awk '{ print $1 }')
+        file2_md5=$(md5sum "$OriginalLang.tmp" | awk '{ print $1 }')
 
-        mv -f "$OriginalLang" "$OriginalLang.po"
+        mv -f "$OriginalLang.tmp" "$OriginalLang.po"
 
         # Verify if remove date error from chatgpt and try again
         if [ "$file1_md5" != "$file2_md5" ]; then
@@ -268,12 +268,12 @@ for i in $LANGUAGES; do
                 buf=$0;
             }
             }
-            END {if(buf) print buf}' "$OriginalLang.po" > "$OriginalLang"
+            END {if(buf) print buf}' "$OriginalLang.po" > "$OriginalLang.tmp"
 
             file1_md5=$(md5sum "$OriginalLang.po" | awk '{ print $1 }')
-            file2_md5=$(md5sum "$OriginalLang" | awk '{ print $1 }')
+            file2_md5=$(md5sum "$OriginalLang.tmp" | awk '{ print $1 }')
 
-            mv -f "$OriginalLang" "$OriginalLang.po"
+            mv -f "$OriginalLang.tmp" "$OriginalLang.po"
         fi
     fi
 
