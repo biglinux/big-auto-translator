@@ -233,8 +233,7 @@ sed -i '/"POT-Creation-Date:/d;/"PO-Revision-Date:/d' $DIR/locale/*
 
 for i in $LANGUAGES; do
     if [ "$i" != "$OriginalLang" ]; then
-        attranslate --srcFile=$DIR/locale/$i.po --srcLng=$OriginalLang --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY  --targetLng=$i
-
+        attranslate --srcFile=$DIR/locale/$OriginalLang.po --srcLng=$OriginalLang --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY --targetFile=$DIR/locale/$i.po --targetLng=$i
         # Remove line translated with add any year from 2020 and 2029 common error on chatgpt
         awk 'BEGIN {buf=""}
         {
@@ -256,7 +255,7 @@ for i in $LANGUAGES; do
 
         # Verify if remove date error from chatgpt and try again
         if [[ "$file1_md5" != "$file2_md5" ]]; then
-            attranslate --srcFile=$DIR/locale/$i.po --srcLng=$OriginalLang --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY  --targetLng=$i
+            attranslate --srcFile=$DIR/locale/$OriginalLang.po --srcLng=$OriginalLang --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY --targetFile=$DIR/locale/$i.po --targetLng=$i
 
             # Remove line translated with add any year from 2020 and 2029 common error on chatgpt
             awk 'BEGIN {buf=""}
