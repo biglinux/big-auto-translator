@@ -200,9 +200,11 @@ for f in $(find $DIR -type f \( -iname "*.py" \));do
     xgettext -o "$DIR/locale/python.pot" $f
     #pygettext3 -o "$DIR/locale/python.pot" $f
     #/usr/lib/python3.10/Tools/i18n/pygettext.py -o "$DIR/locale/python.pot" $f
-    msgcat --no-wrap --strict "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/python.pot" > $DIR/locale/$DIRNAME-tmp.pot
-    xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
-    rm $DIR/locale/$DIRNAME-tmp.pot
+    if [[ -e "$DIR/locale/python.pot" ]]; then
+        msgcat --no-wrap --strict "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/python.pot" > $DIR/locale/$DIRNAME-tmp.pot
+        xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
+        rm $DIR/locale/$DIRNAME-tmp.pot
+    fi
 #     [ "$?" != "0" ] && exit 1
     rm -f "$DIR/locale/python.pot"
 done
@@ -231,7 +233,7 @@ sed -i '/"POT-Creation-Date:/d;/"PO-Revision-Date:/d' $DIR/locale/*
 
 for i in $LANGUAGES; do
     if [ "$i" != "$OriginalLang" ]; then
-        attranslate --srcFile=$DIR/locale/$OriginalLang.po --srcLng=$OriginalLang --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY  --targetLng=$i
+        attranslate --srcFile=$DIR/locale/$i.po --srcLng=$i --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY  --targetLng=$i
 
         # Remove line translated with add any year from 2020 and 2029 common error on chatgpt
         awk 'BEGIN {buf=""}
@@ -245,16 +247,16 @@ for i in $LANGUAGES; do
             buf=$0;
         }
         }
-        END {if(buf) print buf}' "$OriginalLang.po" > "$OriginalLang.tmp"
+        END {if(buf) print buf}' "$DIR/locale/$i.po" > "$DIR/locale/$i.tmp"
 
-        file1_md5=$(md5sum "$OriginalLang.po" | awk '{ print $1 }')
-        file2_md5=$(md5sum "$OriginalLang.tmp" | awk '{ print $1 }')
+        file1_md5=$(md5sum "$DIR/locale/$i.po" | awk '{ print $1 }')
+        file2_md5=$(md5sum "$DIR/locale/$i.tmp" | awk '{ print $1 }')
 
-        mv -f "$OriginalLang.tmp" "$OriginalLang.po"
+        mv -f "$DIR/locale/$i.tmp" "$DIR/locale/$i.po"
 
         # Verify if remove date error from chatgpt and try again
         if [ "$file1_md5" != "$file2_md5" ]; then
-            attranslate --srcFile=$DIR/locale/$OriginalLang.po --srcLng=$OriginalLang --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY  --targetLng=$i
+            attranslate --srcFile=$DIR/locale/$i.po --srcLng=$i --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY  --targetLng=$i
 
             # Remove line translated with add any year from 2020 and 2029 common error on chatgpt
             awk 'BEGIN {buf=""}
@@ -268,12 +270,12 @@ for i in $LANGUAGES; do
                 buf=$0;
             }
             }
-            END {if(buf) print buf}' "$OriginalLang.po" > "$OriginalLang.tmp"
+            END {if(buf) print buf}' "$DIR/locale/$i.po" > "$DIR/locale/$i.tmp"
 
-            file1_md5=$(md5sum "$OriginalLang.po" | awk '{ print $1 }')
-            file2_md5=$(md5sum "$OriginalLang.tmp" | awk '{ print $1 }')
+            file1_md5=$(md5sum "$DIR/locale/$i.po" | awk '{ print $1 }')
+            file2_md5=$(md5sum "$DIR/locale/$i.tmp" | awk '{ print $1 }')
 
-            mv -f "$OriginalLang.tmp" "$OriginalLang.po"
+            mv -f "$DIR/locale/$i.tmp" "$DIR/locale/$i.po"
         fi
     fi
 
