@@ -188,11 +188,10 @@ fi
 # Install .py dependencies
 # sudo pip install python-gettext
 # Search strings to translate
-for f in $(find $DIR -type f \( -iname "*.py" \));do
+for f in $(find $DIR -type f \( -iname "*.py" \) \( -path "*/.git" -o -path "*/.github" \) -prune -o -print | grep -v "^$");do
 
-    # Search python script
-    # [ "$(file -b --mime-type $f)" != "text/x-script.python" ] && continue
-    # [ $(grep 'git' <<< $f) ] && continue
+    # Skip git directories  
+    [ $(echo "$f" | grep -c "\.git") -gt 0 ] && continue
 
     [ ! -e "$DIR/locale/$DIRNAME.pot" ] && >"$DIR/locale/$DIRNAME.pot"
     # Create .pot file
@@ -208,6 +207,23 @@ for f in $(find $DIR -type f \( -iname "*.py" \));do
 #     [ "$?" != "0" ] && exit 1
     rm -f "$DIR/locale/python.pot"
 done
+
+# Additional search specifically in usr/share to ensure all Python files are found
+if [ -d "$DIR/usr/share" ]; then
+    echo "Additional search in usr/share directory..."
+    for f in $(find $DIR/usr/share -type f \( -iname "*.py" \));do
+        [ ! -e "$DIR/locale/$DIRNAME.pot" ] && >"$DIR/locale/$DIRNAME.pot"
+        # Create .pot file
+        echo -e "File:\t\t$f"
+        xgettext -o "$DIR/locale/python.pot" $f
+        if [[ -e "$DIR/locale/python.pot" ]]; then
+            msgcat --no-wrap --strict "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/python.pot" > $DIR/locale/$DIRNAME-tmp.pot
+            xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
+            rm $DIR/locale/$DIRNAME-tmp.pot
+        fi
+        rm -f "$DIR/locale/python.pot"
+    done
+fi
 
 # Make original lang based in .pot
 msgen "$DIR/locale/$DIRNAME.pot" > "$DIR/locale/$OriginalLang.po"
