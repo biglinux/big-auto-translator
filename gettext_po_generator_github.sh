@@ -188,15 +188,16 @@ fi
 # Install .py dependencies
 # sudo pip install python-gettext
 # Search strings to translate
-for f in $(find $DIR -type f \( -iname "*.py" \) \( -path "*/.git" -o -path "*/.github" \) -prune -o -print | grep -v "^$");do
+for f in $(find $DIR -type f \( -iname "*.py" \) \( -path "*/.git" -o -path "*/.github" -o -path "*/usr/share/locale" \) -prune -o -print | grep -v "^$");do
 
-    # Skip git directories  
+    # Skip git directories and compiled locale files
     [ $(echo "$f" | grep -c "\.git") -gt 0 ] && continue
+    [ $(echo "$f" | grep -c "/usr/share/locale/") -gt 0 ] && continue
 
     [ ! -e "$DIR/locale/$DIRNAME.pot" ] && >"$DIR/locale/$DIRNAME.pot"
     # Create .pot file
     echo -e "File:\t\t$f"
-    xgettext -o "$DIR/locale/python.pot" $f
+    xgettext --from-code=UTF-8 -o "$DIR/locale/python.pot" $f
     #pygettext3 -o "$DIR/locale/python.pot" $f
     #/usr/lib/python3.10/Tools/i18n/pygettext.py -o "$DIR/locale/python.pot" $f
     if [[ -e "$DIR/locale/python.pot" ]]; then
@@ -211,11 +212,11 @@ done
 # Additional search specifically in usr/share to ensure all Python files are found
 if [ -d "$DIR/usr/share" ]; then
     echo "Additional search in usr/share directory..."
-    for f in $(find $DIR/usr/share -type f \( -iname "*.py" \));do
+    for f in $(find $DIR/usr/share -type f \( -iname "*.py" \) ! -path "*/usr/share/locale/*");do
         [ ! -e "$DIR/locale/$DIRNAME.pot" ] && >"$DIR/locale/$DIRNAME.pot"
         # Create .pot file
         echo -e "File:\t\t$f"
-        xgettext -o "$DIR/locale/python.pot" $f
+        xgettext --from-code=UTF-8 -o "$DIR/locale/python.pot" $f
         if [[ -e "$DIR/locale/python.pot" ]]; then
             msgcat --no-wrap --strict "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/python.pot" > $DIR/locale/$DIRNAME-tmp.pot
             xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
