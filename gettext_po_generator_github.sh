@@ -37,7 +37,7 @@ echo -e "Directory:\t$DIR"
 #######################
 # Translate shellscript
 #######################
-for f in $(find $DIR \( -path "*/.git" -o -path "*/.github" \) -prune -o -type f);do
+for f in $(find $DIR \( -path "*/.git" -o -path "*/.github" \) -prune -o -type f -print);do
 
     # Search shell script
     [ "$(file -b --mime-type $f)" != "text/x-shellscript" ] && continue
@@ -188,7 +188,7 @@ fi
 # Install .py dependencies
 # sudo pip install python-gettext
 # Search strings to translate
-for f in $(find $DIR -type f \( -iname "*.py" \) \( -path "*/.git" -o -path "*/.github" -o -path "*/usr/share/locale" \) -prune -o -print | grep -v "^$");do
+for f in $(find $DIR \( -path "*/.git" -o -path "*/.github" -o -path "*/usr/share/locale" \) -prune -o -type f -name "*.py" -print);do
 
     # Skip git directories and compiled locale files
     [ $(echo "$f" | grep -c "\.git") -gt 0 ] && continue
