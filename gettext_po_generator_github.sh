@@ -281,6 +281,9 @@ for i in $LANGUAGES; do
 
     sed -i '/Content-Type: text\/plain;/s/charset=.*\\/charset=utf-8\\/' $DIR/locale/$i.po
 
+    # Remove fuzzy and NEEDS WORK
+    sed -i '/^#: NEEDS WORK$/d;/^#, fuzzy$/d' $DIR/locale/$i.po
+
     # Make .mo
     LANGUAGE_UNDERLINE="$(echo $i | sed 's|-|_|g')"
     mkdir -p $DIR/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES
