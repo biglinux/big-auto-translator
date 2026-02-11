@@ -61,23 +61,29 @@ wget https://raw.githubusercontent.com/biglinux/stonejs-tools/master/src/extract
 HTML_JS_FILES=$(find $DIR -type f \( -iname "*.html" -o -iname "*.js" \))
 
 if [ -n "$HTML_JS_FILES" ]; then
-    ADD_JSON="json" # Enable to create .json translations for use on html/js
     stonejs extract $HTML_JS_FILES $DIR/locale/$DIRNAME-tmp.pot
 
-    xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME-js.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
-    rm $DIR/locale/$DIRNAME-tmp.pot
+    # Only enable JSON generation if stonejs found actual translatable strings
+    if [ -f "$DIR/locale/$DIRNAME-tmp.pot" ] && grep -q '^msgid ".' "$DIR/locale/$DIRNAME-tmp.pot"; then
+        ADD_JSON="json"
+        xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME-js.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
+        rm $DIR/locale/$DIRNAME-tmp.pot
 
-    # Combine files from bash and js/html
-    if [[ -e "$DIR/locale/$DIRNAME-js.pot" ]]; then
-        if [[ -e "$DIR/locale/$DIRNAME.pot" ]]; then
-            mv "$DIR/locale/$DIRNAME.pot" "$DIR/locale/$DIRNAME-bash.pot"
-            msgcat --no-wrap --strict "$DIR/locale/$DIRNAME-bash.pot" -i "$DIR/locale/$DIRNAME-js.pot" > $DIR/locale/$DIRNAME-tmp.pot
-            xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
-            rm "$DIR/locale/$DIRNAME-bash.pot"
-            rm "$DIR/locale/$DIRNAME-js.pot"
-        else
-            mv "$DIR/locale/$DIRNAME-js.pot" "$DIR/locale/$DIRNAME.pot"
+        # Combine files from bash and js/html
+        if [[ -e "$DIR/locale/$DIRNAME-js.pot" ]]; then
+            if [[ -e "$DIR/locale/$DIRNAME.pot" ]]; then
+                mv "$DIR/locale/$DIRNAME.pot" "$DIR/locale/$DIRNAME-bash.pot"
+                msgcat --no-wrap --strict "$DIR/locale/$DIRNAME-bash.pot" -i "$DIR/locale/$DIRNAME-js.pot" > $DIR/locale/$DIRNAME-tmp.pot
+                xgettext --package-name="$DIRNAME" --no-location -L PO -o "$DIR/locale/$DIRNAME.pot" -i "$DIR/locale/$DIRNAME-tmp.pot"
+                rm "$DIR/locale/$DIRNAME-bash.pot"
+                rm "$DIR/locale/$DIRNAME-js.pot"
+            else
+                mv "$DIR/locale/$DIRNAME-js.pot" "$DIR/locale/$DIRNAME.pot"
+            fi
         fi
+    else
+        echo "No translatable JS/HTML strings found - skipping JSON generation"
+        [ -f "$DIR/locale/$DIRNAME-tmp.pot" ] && rm -f "$DIR/locale/$DIRNAME-tmp.pot"
     fi
 fi
 
@@ -287,15 +293,18 @@ for i in $LANGUAGES; do
     # Make .mo
     LANGUAGE_UNDERLINE="$(echo $i | sed 's|-|_|g')"
     mkdir -p $DIR/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES
-    # Make json translations ( Only if $2 is json word )
+    # Make json translations (only if stonejs found translatable strings)
     if [[ "$ADD_JSON" == "json" ]]; then
         if [[ -e "$DIR/locale/$i.po" ]]; then
             stonejs build --format=json --merge "$DIR/locale/$i.po" "$DIR/locale/$i.json"
             sed -i "s|^{\"$i\"|{\"$DIR\"|g;s|^{\"C\"|{\"$i\"|g" "$DIR/locale/$i.json"
+            # Only install JSON if it contains actual translations (not empty {})
+            if [ -f "$DIR/locale/$i.json" ] && [ "$(cat "$DIR/locale/$i.json")" != "{}" ]; then
+                cp "$DIR/locale/$i.json" "$DIR/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES/$DIRNAME.json"
+            fi
         else
             rm -f "$DIR/locale/$i.json"
         fi
-        cp "$DIR/locale/$i.json" "$DIR/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES/$DIRNAME.json"
     fi
 
     msgfmt "$DIR/locale/$i.po" -o "$DIR/usr/share/locale/$LANGUAGE_UNDERLINE/LC_MESSAGES/$DIRNAME.mo" || true
