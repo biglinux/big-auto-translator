@@ -215,8 +215,10 @@ for f in $(find $DIR -type f \( -iname "*.py" \));do
     rm -f "$DIR/locale/python.pot"
 done
 
-# Make original lang based in .pot
-msgen "$DIR/locale/$DIRNAME.pot" > "$DIR/locale/$OriginalLang.po"
+# Make original lang based in .pot. msginit fills in the Language and
+# Plural-Forms headers that the .pot only has as placeholders; a catalog that
+# keeps "plural=EXPRESSION" makes Python's gettext refuse to load it.
+msgen "$DIR/locale/$DIRNAME.pot" | msginit --no-translator --no-wrap --locale="$OriginalLang" -i - -o "$DIR/locale/$OriginalLang.po"
 
 # Remove date
 sed -i '/"POT-Creation-Date:/d;/"PO-Revision-Date:/d' $DIR/locale/*
