@@ -215,6 +215,13 @@ for f in $(find $DIR -type f \( -iname "*.py" \));do
     rm -f "$DIR/locale/python.pot"
 done
 
+# Without strings (none in the package, or extraction failed) every catalog
+# below would be emptied
+if ! grep -q '^msgid[[:space:]]*"[^"]' "$DIR/locale/$DIRNAME.pot" 2>/dev/null; then
+    echo "No translatable strings found, keeping the current catalogs"
+    exit 0
+fi
+
 # Make original lang based in .pot. msginit fills in the Language and
 # Plural-Forms headers that the .pot only has as placeholders; a catalog that
 # keeps "plural=EXPRESSION" makes Python's gettext refuse to load it.
@@ -239,50 +246,96 @@ sed -i '/"POT-Creation-Date:/d;/"PO-Revision-Date:/d' $DIR/locale/*
 
 # cat /usr/local/lib/node_modules/attranslate/dist/services/openai-translate.js
 
+# attranslate 3 is an offline helper for coding agents: it has no openai
+# service and no --srcFormat/--targetFormat, so every call failed and the
+# catalogs were silently left as they were. openai-translate.js patches 2.x.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if ! attranslate --version 2>/dev/null | grep -q '^2\.'; then
+    sudo npm install --location=global attranslate@2.3.1
+    for js in "$SCRIPT_DIR/openai-translate.js" "$SCRIPT_DIR/big-auto-translator/openai-translate.js"; do
+        if [ -e "$js" ]; then
+            sudo cp -f "$js" "$(npm root -g)/attranslate/dist/services/openai-translate.js"
+            break
+        fi
+    done
+fi
+
+# Outside the repository: the workflows commit with "git add --all"
+TMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+# attranslate 2.x rewrites plural messages, translated or not: it joins the
+# forms into msgstr[0] ("%1 file,%1 files") and drops the others. It only
+# sees singular messages; plurals are kept from the current catalog.
+drop_plurals() {
+    awk 'BEGIN { RS = ""; ORS = "\n\n" } !/\nmsgid_plural /' "$@"
+}
+
+# Drop plurals an older run already broke (msgstr[1] missing although the
+# language has more than one form), so msgmerge recreates them empty and
+# the program falls back to the original text instead of "a,b"
+drop_broken_plurals() {
+    awk 'BEGIN { RS = ""; ORS = "\n\n" }
+    NR == 1 { n = 2; if (match($0, /nplurals=[0-9]+/)) n = substr($0, RSTART + 9, RLENGTH - 9) + 0 }
+    !(n > 1 && /\nmsgid_plural / && !/\nmsgstr\[1\]/)' "$@"
+}
+
+drop_plurals "$DIR/locale/$OriginalLang.po" > "$TMP_DIR/source.po"
+
+run_attranslate() {
+    attranslate --srcFile="$TMP_DIR/source.po" --srcLng=$OriginalLang --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY --targetFile="$2" --targetLng=$1
+}
+
+# Remove messages translated with any year from 2020 to 2029, a common error
+# on chatgpt; returns 0 when something was removed so it can be retried.
+# "have" instead of testing the buffer itself, which dropped blank lines
+# and made every file look changed.
+remove_year_errors() {
+    if awk '
+        have && prev ~ /^msgid/ && prev !~ /202./ && /^msgstr/ && /202./ { have = 0; removed = 1; next }
+        have { print prev }
+        { prev = $0; have = 1 }
+        END { if (have) print prev; exit !removed }' "$1" > "$1.tmp"; then
+        mv -f "$1.tmp" "$1"
+        return 0
+    fi
+    rm -f "$1.tmp"
+    return 1
+}
+
+translate_catalog() {
+    local po="$DIR/locale/$1.po"
+    local work="$TMP_DIR/$1.po"
+    local merged="$TMP_DIR/$1-merged.po"
+
+    # attranslate only fills messages missing from the target: drop the
+    # empty ones, or they are never translated
+    rm -f "$work"
+    if [ -s "$po" ]; then
+        msgattrib --translated --no-obsolete --no-wrap "$po" | drop_plurals > "$work"
+    fi
+
+    run_attranslate "$1" "$work" || return 1
+    if remove_year_errors "$work"; then
+        run_attranslate "$1" "$work" || return 1
+        remove_year_errors "$work"
+    fi
+
+    if [ -s "$po" ]; then
+        drop_broken_plurals "$po" > "$TMP_DIR/$1-current.po"
+        msgcat --use-first --no-wrap "$work" "$TMP_DIR/$1-current.po" -o "$merged" || return 1
+    else
+        cp "$work" "$merged"
+    fi
+    msgmerge --quiet --no-fuzzy-matching --no-wrap "$merged" "$DIR/locale/$DIRNAME.pot" -o "$TMP_DIR/$1-final.po" || return 1
+    msgattrib --no-obsolete --no-wrap "$TMP_DIR/$1-final.po" -o "$po"
+}
+
 for i in $LANGUAGES; do
     if [ "$i" != "$OriginalLang" ]; then
-        attranslate --srcFile=$DIR/locale/$OriginalLang.po --srcLng=$OriginalLang --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY --targetFile=$DIR/locale/$i.po --targetLng=$i
-        # Remove line translated with add any year from 2020 and 2029 common error on chatgpt
-        awk 'BEGIN {buf=""}
-        {
-        if(buf ~ /^msgid/ && buf !~ /202./ && $0 ~ /^msgstr/ && $0 ~ /202./) {
-            buf="";
-        } else if(buf) {
-            print buf;
-            buf=$0;
-        } else {
-            buf=$0;
-        }
-        }
-        END {if(buf) print buf}' "$DIR/locale/$i.po" > "$DIR/locale/$i.tmp"
-
-        file1_md5=$(md5sum "$DIR/locale/$i.po" | awk '{ print $1 }')
-        file2_md5=$(md5sum "$DIR/locale/$i.tmp" | awk '{ print $1 }')
-
-        mv -f "$DIR/locale/$i.tmp" "$DIR/locale/$i.po"
-
-        # Verify if remove date error from chatgpt and try again
-        if [[ "$file1_md5" != "$file2_md5" ]]; then
-            attranslate --srcFile=$DIR/locale/$OriginalLang.po --srcLng=$OriginalLang --srcFormat=po --targetFormat=po --service=openai --serviceConfig=$OPENAI_KEY --targetFile=$DIR/locale/$i.po --targetLng=$i
-
-            # Remove line translated with add any year from 2020 and 2029 common error on chatgpt
-            awk 'BEGIN {buf=""}
-            {
-            if(buf ~ /^msgid/ && buf !~ /202./ && $0 ~ /^msgstr/ && $0 ~ /202./) {
-                buf="";
-            } else if(buf) {
-                print buf;
-                buf=$0;
-            } else {
-                buf=$0;
-            }
-            }
-            END {if(buf) print buf}' "$DIR/locale/$i.po" > "$DIR/locale/$i.tmp"
-
-            file1_md5=$(md5sum "$DIR/locale/$i.po" | awk '{ print $1 }')
-            file2_md5=$(md5sum "$DIR/locale/$i.tmp" | awk '{ print $1 }')
-
-            mv -f "$DIR/locale/$i.tmp" "$DIR/locale/$i.po"
+        if ! translate_catalog "$i"; then
+            echo "Translation to $i failed" >&2
+            exit 1
         fi
     fi
 
